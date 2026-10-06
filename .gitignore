@@ -2,3 +2,8 @@ node_modules/
 .next/
 .env
 *.log
+generated/
+backend/.agents/
+backend/.claude/
+backend/.windsurf/
+backend/skills-lock.json

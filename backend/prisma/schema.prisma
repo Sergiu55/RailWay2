@@ -1,0 +1,93 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(50)
+  email        String    @unique @db.VarChar(100)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  role         String?   @default("client") @db.VarChar(20)
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  bookings     Booking[]
+
+  @@map("users")
+}
+
+model Station {
+  id                Int       @id @default(autoincrement())
+  name              String    @db.VarChar(100)
+  city              String    @db.VarChar(100)
+  country           String    @db.VarChar(100)
+  createdAt         DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  originRoutes      Route[]   @relation("OriginStation")
+  destinationRoutes Route[]   @relation("DestinationStation")
+
+  @@map("stations")
+}
+
+model Route {
+  id                   Int       @id @default(autoincrement())
+  originStationId      Int       @map("origin_station_id")
+  destinationStationId Int       @map("destination_station_id")
+  distanceKm           Decimal?  @map("distance_km") @db.Decimal(8, 2)
+  createdAt            DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  origin               Station   @relation("OriginStation", fields: [originStationId], references: [id])
+  destination          Station   @relation("DestinationStation", fields: [destinationStationId], references: [id])
+  trips                Trip[]
+
+  @@map("routes")
+}
+
+model Trip {
+  id            Int       @id @default(autoincrement())
+  routeId       Int       @map("route_id")
+  trainNumber   String    @map("train_number") @db.VarChar(50)
+  departureTime DateTime  @map("departure_time")
+  arrivalTime   DateTime  @map("arrival_time")
+  pricePerAdult Decimal   @map("price_per_adult") @db.Decimal(10, 2)
+  pricePerChild Decimal   @map("price_per_child") @db.Decimal(10, 2)
+  availableSeats Int      @map("available_seats")
+  status        String?   @default("scheduled") @db.VarChar(20)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  route         Route     @relation(fields: [routeId], references: [id])
+  bookings      Booking[]
+
+  @@map("trips")
+}
+
+model Booking {
+  id          Int         @id @default(autoincrement())
+  bookingCode String      @unique @map("booking_code") @db.VarChar(20)
+  userId      Int         @map("user_id")
+  tripId      Int         @map("trip_id")
+  bookingDate DateTime?   @default(now()) @map("booking_date") @db.Timestamp(0)
+  status      String?     @default("confirmed") @db.VarChar(20)
+  totalPrice  Decimal     @map("total_price") @db.Decimal(10, 2)
+  isReturn    Boolean?    @default(false) @map("is_return")
+  user        User        @relation(fields: [userId], references: [id])
+  trip        Trip        @relation(fields: [tripId], references: [id])
+  passengers  Passenger[]
+
+  @@map("bookings")
+}
+
+model Passenger {
+  id            Int       @id @default(autoincrement())
+  bookingId     Int       @map("booking_id")
+  passengerType String    @map("passenger_type") @db.VarChar(20)
+  firstName     String    @map("first_name") @db.VarChar(100)
+  lastName      String    @map("last_name") @db.VarChar(100)
+  seatNumber    String?   @map("seat_number") @db.VarChar(10)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+
+  @@map("passengers")
+}
