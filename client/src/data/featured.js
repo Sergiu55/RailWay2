@@ -15,7 +15,7 @@ export const featuredCountries = [
   {
     slug: "romania",
     name: "Romania",
-    image: "/images/romania.jpg",
+    image: "/images/rominia.jpg",
     routes: [
       { from: "Bucharest", to: "Brașov", duration: "2 h 40 m" },
       { from: "Bucharest", to: "Cluj-Napoca", duration: "6 h 30 m" },

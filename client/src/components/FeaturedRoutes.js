@@ -16,33 +16,55 @@ function RouteRow({ route, dark }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 2,
-        px: 1.5,
-        py: 1,
-        borderRadius: 2,
+        gap: 1,
+        py: 0.9,
         textDecoration: "none",
-        color: dark ? "#fff" : "#1F2937",
-        bgcolor: dark ? "rgba(255,255,255,0.06)" : "#f9fafb",
-        border: dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid #eef2f7",
+        color: dark ? "#fff" : "text.primary",
+        borderBottom: "1px solid",
+        borderColor: dark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.08)",
+        "&:last-of-type": { borderBottom: "none" },
+        "&:hover .route-names": { color: "primary.main" },
       }}
     >
-      <Box>
-        <Typography sx={{ fontWeight: 700, fontSize: 14 }}>{route.from}</Typography>
-        <Typography sx={{ fontSize: 12, opacity: 0.8 }}>{route.to}</Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Typography sx={{ fontWeight: 600, fontSize: 12 }}>{route.duration}</Typography>
+      <Box
+        className="route-names"
+        sx={{ display: "flex", alignItems: "center", gap: 1, fontSize: 17 }}
+      >
+        {route.from}
         <ArrowForwardIcon sx={{ fontSize: 16 }} />
+        {route.to}
       </Box>
+      <Typography
+        variant="body2"
+        sx={{
+          color: dark ? "rgba(255,255,255,.75)" : "text.secondary",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {route.duration}
+      </Typography>
     </Box>
   );
 }
 
 function CountryLabel({ name }) {
   return (
-    <Typography variant="overline" sx={{ letterSpacing: 1.2, color: "#F59E0B", fontWeight: 700 }}>
+    <Box
+      sx={{
+        position: "absolute",
+        top: 20,
+        left: 20,
+        bgcolor: "rgba(0,0,0,.7)",
+        color: "#fff",
+        fontSize: 13,
+        px: 1.5,
+        py: 0.5,
+        borderRadius: 1,
+        zIndex: 1,
+      }}
+    >
       {name}
-    </Typography>
+    </Box>
   );
 }
 
@@ -50,22 +72,33 @@ function BigCard({ country }) {
   return (
     <Box
       sx={{
-        flex: 1.6,
-        minHeight: 360,
-        borderRadius: 4,
-        overflow: "hidden",
         position: "relative",
-        background: `linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.7)), url('${country.image}') center/cover no-repeat`,
-        boxShadow: "0 18px 35px rgba(15,23,42,0.12)",
+        borderRadius: 2,
+        overflow: "hidden",
+        minHeight: { xs: 480, md: 0 },
+        gridRow: { md: "span 2" },
+        bgcolor: "#333",
+        backgroundImage: `url('${country.image}')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        alignItems: "flex-end",
       }}
     >
-      <Box sx={{ position: "absolute", inset: 0, p: 3, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-        <CountryLabel name={country.name} />
-        <Box sx={{ mt: 2, display: "grid", gap: 1.2 }}>
-          {country.routes.map((r) => (
-            <RouteRow key={`${country.slug}-${r.from}-${r.to}`} route={r} dark />
-          ))}
-        </Box>
+      <CountryLabel name={country.name} />
+      <Box
+        sx={{
+          m: 1.5,
+          px: 1.5,
+          py: 0.5,
+          width: "100%",
+          bgcolor: "rgba(20,20,20,.92)",
+          borderRadius: 1.5,
+        }}
+      >
+        {country.routes.map((r) => (
+          <RouteRow key={`${r.from}-${r.to}`} route={r} dark />
+        ))}
       </Box>
     </Box>
   );
@@ -75,18 +108,28 @@ function SmallCard({ country }) {
   return (
     <Box
       sx={{
-        bgcolor: "#fff",
-        borderRadius: 4,
-        p: 2,
-        boxShadow: "0 12px 30px rgba(15,23,42,0.08)",
+        borderRadius: 2,
+        overflow: "hidden",
+        bgcolor: "#F5F5F5",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          position: "relative",
+          height: 230,
+          bgcolor: "#333",
+          backgroundImage: `url('${country.image}')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <CountryLabel name={country.name} />
       </Box>
-      <Box sx={{ display: "grid", gap: 1.5 }}>
+      <Box sx={{ px: 1.5, py: 0.5 }}>
         {country.routes.map((r) => (
-          <RouteRow key={`${country.slug}-${r.from}-${r.to}`} route={r} dark={false} />
+          <RouteRow key={`${r.from}-${r.to}`} route={r} />
         ))}
       </Box>
     </Box>
@@ -97,25 +140,34 @@ export default function FeaturedRoutes() {
   const [featured, ...others] = featuredCountries;
 
   return (
-    <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: "#f8fafc" }}>
-      <Container maxWidth="lg">
-        <Typography variant="overline" sx={{ color: "#F59E0B", fontWeight: 700, letterSpacing: 1.5 }}>
-          TRAVEL WITH RAILWAY
-        </Typography>
-        <Typography variant="h3" sx={{ mt: 1, mb: 4, fontWeight: 800 }}>
-          Trains in Europe
-        </Typography>
+    <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
+      <Typography variant="overline" sx={{ letterSpacing: 1 }}>
+        TRAVEL WITH RAILWAY
+      </Typography>
+      <Typography
+        variant="h3"
+        component="h2"
+        sx={{ fontSize: { xs: 30, md: 44 }, fontWeight: 400, mb: 5 }}
+      >
+        Trains in Europe
+      </Typography>
 
-        <Box sx={{ display: "flex", gap: 3, flexDirection: { xs: "column", md: "row" } }}>
-          <BigCard country={featured} />
-
-          <Box sx={{ flex: 1, display: "grid", gap: 3 }}>
-            {others.map((c) => (
-              <SmallCard key={c.slug} country={c} />
-            ))}
-          </Box>
-        </Box>
-      </Container>
-    </Box>
+      <Box
+        sx={{
+          display: "grid",
+          gap: 2,
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "1fr 1fr 1fr",
+          },
+        }}
+      >
+        <BigCard country={featured} />
+        {others.map((c) => (
+          <SmallCard key={c.slug} country={c} />
+        ))}
+      </Box>
+    </Container>
   );
 }
